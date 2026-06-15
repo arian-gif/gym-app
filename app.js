@@ -153,6 +153,7 @@ function startWorkout(workout) {
     entries: template.map((ex) => ({
       name: ex.name,
       note: ex.note || "",
+      timed: !!ex.timed,
       sets: Array.from({ length: ex.sets }, () => ({ weight: "", reps: "" })),
     })),
   };
@@ -172,6 +173,7 @@ function finishWorkout() {
     .map((e) => ({
       name: e.name,
       note: e.note,
+      timed: !!e.timed,
       sets: e.sets
         .filter((s) => s.weight !== "" || s.reps !== "")
         .map((s) => ({ weight: Number(s.weight) || 0, reps: Number(s.reps) || 0 })),
@@ -237,6 +239,19 @@ function renderTrain() {
   const ex = draft.entries.map((e, ei) => {
     const prev = prevSets(draft.workout, e.name, e.note);
     const setsHtml = e.sets.map((s, si) => {
+      if (e.timed) {
+        const p = prev && prev[si] ? `${prev[si].reps}s` : "—";
+        return `<div class="setrow timed">
+          <div class="lbl">Set ${si + 1}</div>
+          <div class="field" style="grid-column:2 / 4">
+            <input inputmode="numeric" placeholder="${prev && prev[si] ? prev[si].reps : ""}"
+              value="${s.reps}" onchange="setVal(${ei},${si},'reps',this.value)" />
+            <span class="unit">sec</span>
+          </div>
+          <button class="iconbtn" title="Remove set" onclick="removeSet(${ei},${si})">✕</button>
+        </div>
+        <div class="prev">prev: ${p}</div>`;
+      }
       const p = prev && prev[si] ? `${prev[si].weight}×${prev[si].reps}` : "—";
       return `<div class="setrow">
         <div class="lbl">Set ${si + 1}</div>
@@ -254,10 +269,13 @@ function renderTrain() {
       </div>
       <div class="prev">prev: ${p}</div>`;
     }).join("");
+    const colhead = e.timed
+      ? `<div class="colhead"><span></span><span style="grid-column:2 / 4">Seconds</span><span></span></div>`
+      : `<div class="colhead"><span></span><span>Weight</span><span>Reps</span><span></span></div>`;
     return `<div class="card ex">
       <h3>${e.name}</h3>
       ${e.note ? `<div class="cue">${e.note}</div>` : ""}
-      <div class="colhead"><span></span><span>Weight</span><span>Reps</span><span></span></div>
+      ${colhead}
       ${setsHtml}
       <button class="btn sm ghost" onclick="addSet(${ei})">+ Add set</button>
     </div>`;
@@ -295,7 +313,7 @@ function renderHistory() {
   view().innerHTML = sessions.map((s) => {
     const cls = isUpper(s.workout) ? "upper" : "lower";
     const lines = s.entries.map((e) => {
-      const setStr = e.sets.map((x) => `${x.weight}×${x.reps}`).join(", ");
+      const setStr = e.sets.map((x) => (e.timed ? `${x.reps}s` : `${x.weight}×${x.reps}`)).join(", ");
       return `<div class="row between" style="font-size:14px;margin-top:6px">
         <span>${e.name}</span><span class="muted">${setStr}</span></div>`;
     }).join("");
@@ -334,7 +352,7 @@ let chart = null;
 function allExercises() {
   const set = new Map();
   state.sessions.forEach((s) =>
-    s.entries.forEach((e) => set.set(exKey(e.name, e.note), { name: e.name, note: e.note }))
+    s.entries.forEach((e) => set.set(exKey(e.name, e.note), { name: e.name, note: e.note, timed: !!e.timed }))
   );
   return [...set.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
@@ -361,19 +379,19 @@ function renderProgress() {
       <div class="row" id="stats"></div>
       <div class="chartwrap"><canvas id="chart"></canvas></div>
       <div class="muted" style="font-size:11px;text-align:center;margin-top:8px">
-        Estimated 1-rep max (Epley) from your best set each session.
+        ${current.timed ? "Longest hold (seconds) each session." : "Estimated 1-rep max (Epley) from your best set each session."}
       </div>
     </div>`;
-  drawChart(current.name, current.note);
+  drawChart(current.name, current.note, current.timed);
 }
 
 function onPickExercise(key) {
   localStorage.setItem("gym_progress_ex", key);
   const ex = allExercises().find((e) => exKey(e.name, e.note) === key);
-  if (ex) drawChart(ex.name, ex.note);
+  if (ex) drawChart(ex.name, ex.note, ex.timed);
 }
 
-function drawChart(name, note) {
+function drawChart(name, note, timed) {
   const points = [];
   state.sessions
     .filter((s) => s.entries.some((e) => exKey(e.name, e.note) === exKey(name, note)))
@@ -382,23 +400,27 @@ function drawChart(name, note) {
       const e = s.entries.find((x) => exKey(x.name, x.note) === exKey(name, note));
       let best = 0, bestSet = null;
       e.sets.forEach((st) => {
-        const e1 = epley(st.weight, st.reps);
-        if (e1 > best) { best = e1; bestSet = st; }
+        const v = timed ? st.reps : epley(st.weight, st.reps); // seconds for timed, est 1RM otherwise
+        if (v > best) { best = v; bestSet = st; }
       });
-      if (best > 0) points.push({ date: s.date, e1rm: best, set: bestSet });
+      if (best > 0) points.push({ date: s.date, val: best, set: bestSet });
     });
 
   const labels = points.map((p) => fmtDate(p.date));
-  const data = points.map((p) => p.e1rm);
+  const data = points.map((p) => p.val);
 
   // stats
   const first = points[0], last = points[points.length - 1];
-  const delta = first && last ? last.e1rm - first.e1rm : 0;
-  const heaviest = points.reduce((m, p) => Math.max(m, p.set.weight), 0);
+  const delta = first && last ? last.val - first.val : 0;
+  const best = points.reduce((m, p) => Math.max(m, p.val), 0);
+  const metricLabel = timed ? "Hold (s)" : "Est 1RM";
+  const bestLabel = timed ? "Best hold" : "Top weight";
+  const bestVal = timed ? best + "s" : points.reduce((m, p) => Math.max(m, p.set.weight), 0);
+  const curVal = timed ? (last ? last.val + "s" : "0") : (last ? last.val : 0);
   document.getElementById("stats").innerHTML = `
-    <div class="stat"><div class="n">${last ? last.e1rm : 0}</div><div class="l">Est 1RM</div></div>
-    <div class="stat"><div class="n" style="color:${delta >= 0 ? "var(--accent-2)" : "var(--danger)"}">${delta >= 0 ? "+" : ""}${delta}</div><div class="l">Change</div></div>
-    <div class="stat"><div class="n">${heaviest}</div><div class="l">Top weight</div></div>`;
+    <div class="stat"><div class="n">${curVal}</div><div class="l">${metricLabel}</div></div>
+    <div class="stat"><div class="n" style="color:${delta >= 0 ? "var(--accent-2)" : "var(--danger)"}">${delta >= 0 ? "+" : ""}${delta}${timed ? "s" : ""}</div><div class="l">Change</div></div>
+    <div class="stat"><div class="n">${bestVal}</div><div class="l">${bestLabel}</div></div>`;
 
   const ctx = document.getElementById("chart");
   if (chart) chart.destroy();
@@ -422,7 +444,9 @@ function drawChart(name, note) {
           callbacks: {
             label: (c) => {
               const p = points[c.dataIndex];
-              return `1RM ${p.e1rm} ${UNIT}  (best ${p.set.weight}×${p.set.reps})`;
+              return timed
+                ? `Hold ${p.val}s`
+                : `1RM ${p.val} ${UNIT}  (best ${p.set.weight}×${p.set.reps})`;
             },
           },
         },
