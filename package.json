@@ -1,0 +1,9 @@
+{
+  "name": "gym-tracker",
+  "version": "1.0.0",
+  "description": "Mobile PWA to track Upper/Lower gym workouts, synced to MongoDB via a Netlify function.",
+  "private": true,
+  "dependencies": {
+    "mongodb": "^6.8.0"
+  }
+}
