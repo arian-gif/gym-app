@@ -17,7 +17,8 @@ window.WORKOUTS = {
     { name: "Bulgarian Split Squats", sets: 2 },
     { name: "Leg Extensions", sets: 2 },
     { name: "Machine Calf Raises", sets: 2 },
-    { name: "Heavy Cable Crunches", sets: 2 },
+    { name: "Heavy Cable Crunches", sets: 3 },
+    { name: "Planks", sets: 1, timed: true, note: "Hold to failure" },
   ],
   "Upper B": [
     { name: "Incline Smith Machine Press", sets: 2, note: "or Dumbbells" },
@@ -33,7 +34,8 @@ window.WORKOUTS = {
     { name: "Leg Press", sets: 2, note: "Feet higher/wider for glutes/hams" },
     { name: "Leg Extensions", sets: 2 },
     { name: "Leg Press Calf Raises", sets: 2 },
-    { name: "Hanging Leg Raises", sets: 2, note: "To failure" },
+    { name: "Hanging Leg Raises", sets: 3, note: "To failure" },
+    { name: "Cable Woodchoppers", sets: 3, note: "8-12 reps per side" },
   ],
 };
 
