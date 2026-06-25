@@ -1,6 +1,8 @@
-// Minimal service worker: cache the app shell so it loads offline.
-// Data (/api/data) is always fetched fresh from the network.
-const CACHE = "gym-shell-v1";
+// Service worker: cache the app shell for offline use, but keep the app's own
+// files fresh. App assets are network-first (always latest when online, cache
+// only as offline fallback); the Chart.js CDN file is cache-first.
+// Data (/api/data) is never cached. Bump CACHE to force a refresh of cached assets.
+const CACHE = "gym-shell-v2";
 const SHELL = [
   "./",
   "./index.html",
@@ -29,7 +31,23 @@ self.addEventListener("fetch", (e) => {
   // never cache the API
   if (url.pathname.includes("/api/") || url.pathname.includes("/.netlify/")) return;
   if (e.request.method !== "GET") return;
-  // network-first for navigations, cache-first for assets
+
+  // Our own files (HTML/JS/CSS) -> network-first so template/code updates show up
+  // immediately when online; fall back to cache only when offline.
+  if (url.origin === self.location.origin) {
+    e.respondWith(
+      fetch(e.request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Cross-origin (Chart.js CDN) -> cache-first (it's versioned and rarely changes).
   e.respondWith(
     caches.match(e.request).then((cached) =>
       cached ||
@@ -37,7 +55,7 @@ self.addEventListener("fetch", (e) => {
         const copy = res.clone();
         caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
         return res;
-      }).catch(() => cached)
+      })
     )
   );
 });
