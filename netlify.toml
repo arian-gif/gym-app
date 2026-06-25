@@ -7,3 +7,15 @@
   from = "/api/data"
   to = "/.netlify/functions/data"
   status = 200
+
+# Never let the browser cache the service worker or the HTML shell, so template
+# and code updates are picked up on a normal reload (no manual cache clearing).
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
