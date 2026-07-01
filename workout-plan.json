@@ -68,6 +68,11 @@
         "sets": 3
       },
       {
+        "name": "Hanging Leg Raises",
+        "sets": 3,
+        "note": "To failure"
+      },
+      {
         "name": "Planks",
         "sets": 1,
         "timed": true,
@@ -138,6 +143,10 @@
         "name": "Hanging Leg Raises",
         "sets": 3,
         "note": "To failure"
+      },
+      {
+        "name": "Cable Crunches",
+        "sets": 3
       },
       {
         "name": "Cable Woodchoppers",
