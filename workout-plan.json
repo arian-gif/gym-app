@@ -73,10 +73,14 @@
         "note": "To failure"
       },
       {
-        "name": "Planks",
-        "sets": 1,
-        "timed": true,
-        "note": "Hold to failure"
+        "name": "Cable Woodchoppers",
+        "sets": 3,
+        "note": "8-12 reps per side"
+      },
+      {
+        "name": "Weighted Decline Situps",
+        "sets": 3,
+        "note": "Hold a plate on your chest"
       },
       {
         "name": "Neck Extensions",
@@ -152,6 +156,11 @@
         "name": "Cable Woodchoppers",
         "sets": 3,
         "note": "8-12 reps per side"
+      },
+      {
+        "name": "Weighted Decline Situps",
+        "sets": 3,
+        "note": "Hold a plate on your chest"
       },
       {
         "name": "Neck Curls",
