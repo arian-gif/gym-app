@@ -53,6 +53,8 @@ exports.handler = async (event) => {
       const doc = await col.findOne({ _id: DOC_ID });
       return json(200, {
         sessions: doc ? doc.sessions || [] : [],
+        foodLog: doc ? doc.foodLog || [] : [],
+        goals: doc ? doc.goals || {} : {},
         updatedAt: doc ? doc.updatedAt || 0 : 0,
       });
     }
@@ -60,10 +62,12 @@ exports.handler = async (event) => {
     if (event.httpMethod === "PUT") {
       const body = JSON.parse(event.body || "{}");
       const sessions = Array.isArray(body.sessions) ? body.sessions : [];
+      const foodLog = Array.isArray(body.foodLog) ? body.foodLog : [];
+      const goals = body.goals && typeof body.goals === "object" ? body.goals : {};
       const updatedAt = Number(body.updatedAt) || Date.now();
       await col.updateOne(
         { _id: DOC_ID },
-        { $set: { sessions, updatedAt } },
+        { $set: { sessions, foodLog, goals, updatedAt } },
         { upsert: true }
       );
       return json(200, { ok: true, updatedAt });

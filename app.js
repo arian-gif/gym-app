@@ -21,12 +21,19 @@ let pushTimer = null;
 
 function go(tab) { activeTab = tab; render(); }
 
+const EMPTY_GOALS = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+
+function normalizeState(s) {
+  if (!s || !Array.isArray(s.sessions)) s = { sessions: [], updatedAt: 0 };
+  if (!Array.isArray(s.foodLog)) s.foodLog = [];
+  if (!s.goals || typeof s.goals !== "object") s.goals = { ...EMPTY_GOALS };
+  return s;
+}
+
 function loadState() {
-  try {
-    const s = JSON.parse(localStorage.getItem(LS_STATE));
-    if (s && Array.isArray(s.sessions)) return s;
-  } catch (e) {}
-  return { sessions: [], updatedAt: 0 };
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(LS_STATE)); } catch (e) {}
+  return normalizeState(s);
 }
 function loadDraft() {
   try { return JSON.parse(localStorage.getItem(LS_DRAFT)); } catch (e) { return null; }
@@ -78,7 +85,12 @@ async function pull() {
     const remote = await apiFetch("GET");
     const rUpdated = remote && remote.updatedAt ? remote.updatedAt : 0;
     if (rUpdated > (state.updatedAt || 0)) {
-      state = { sessions: remote.sessions || [], updatedAt: rUpdated };
+      state = normalizeState({
+        sessions: remote.sessions || [],
+        foodLog: remote.foodLog || [],
+        goals: remote.goals || { ...EMPTY_GOALS },
+        updatedAt: rUpdated,
+      });
       saveStateLocal();
       render();
       setSync("Synced ✓", "ok");
@@ -100,7 +112,12 @@ function queuePush() {
 
 async function push() {
   try {
-    await apiFetch("PUT", { sessions: state.sessions, updatedAt: state.updatedAt });
+    await apiFetch("PUT", {
+      sessions: state.sessions,
+      foodLog: state.foodLog,
+      goals: state.goals,
+      updatedAt: state.updatedAt,
+    });
     setSync("Synced ✓", "ok");
   } catch (e) {
     setSync("Saved on device", "err");
@@ -205,6 +222,7 @@ function render() {
   if (activeTab === "train") renderTrain();
   else if (activeTab === "history") renderHistory();
   else if (activeTab === "progress") renderProgress();
+  else if (activeTab === "food") renderFood();
   else if (activeTab === "settings") renderSettings();
   window.scrollTo(0, 0);
 }
@@ -459,6 +477,229 @@ function drawChart(name, note, timed) {
   });
 }
 
+/* --- NUTRITION / FOOD --- */
+let foodDate = todayISO();
+let foodForm = null;      // {name,kcal,protein,carbs,fat,_title,_raw} while adding
+let foodResults = null;   // {loading,items,error} search panel
+let foodQuery = "";
+let ocrBusy = false;
+
+const escapeHtml = (s) => String(s == null ? "" : s).replace(/[&<>"']/g,
+  (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const round1 = (x) => (x == null || isNaN(x) ? 0 : Math.round(x * 10) / 10);
+const sameDay = (iso) => iso === todayISO();
+
+function foodEntriesFor(date) { return state.foodLog.filter((f) => f.date === date); }
+function foodTotals(date) {
+  return foodEntriesFor(date).reduce((t, f) => ({
+    kcal: t.kcal + (Number(f.kcal) || 0),
+    protein: t.protein + (Number(f.protein) || 0),
+    carbs: t.carbs + (Number(f.carbs) || 0),
+    fat: t.fat + (Number(f.fat) || 0),
+  }), { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+}
+
+function macroBar(label, val, goal, color) {
+  const pct = goal > 0 ? Math.min(100, Math.round((val / goal) * 100)) : 0;
+  return `<div class="macro">
+    <div class="macro-top"><span>${label}</span><span class="muted">${Math.round(val)}${goal > 0 ? " / " + goal : ""} g</span></div>
+    <div class="bar"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+  </div>`;
+}
+
+function changeFoodDate(delta) {
+  const d = new Date(foodDate + "T00:00:00");
+  d.setDate(d.getDate() + delta);
+  foodDate = d.toLocaleDateString("en-CA");
+  foodForm = null; foodResults = null; render();
+}
+
+function openManualFood() { foodForm = { name: "", kcal: "", protein: "", carbs: "", fat: "", _title: "Add food" }; foodResults = null; render(); }
+function openFoodSearch() { foodResults = { loading: false, items: null }; foodForm = null; render(); setTimeout(() => { const el = document.getElementById("foodSearch"); if (el) el.focus(); }, 50); }
+function closeFoodForm() { foodForm = null; foodResults = null; render(); }
+function foodFormInput(field, val) { if (foodForm) foodForm[field] = val; }
+function setFoodQuery(v) { foodQuery = v; }
+
+function addFoodEntry() {
+  if (!foodForm) return;
+  const kcal = Math.round(Number(foodForm.kcal) || 0);
+  if (!foodForm.name && !kcal) { alert("Enter a name or calories."); return; }
+  state.foodLog.push({
+    id: uid(), date: foodDate, name: (foodForm.name || "Food").trim(),
+    kcal, protein: round1(Number(foodForm.protein) || 0),
+    carbs: round1(Number(foodForm.carbs) || 0), fat: round1(Number(foodForm.fat) || 0),
+  });
+  commit();
+  foodForm = null; foodResults = null;
+  toast("Added ✓"); render();
+}
+function removeFood(id) { state.foodLog = state.foodLog.filter((f) => f.id !== id); commit(); render(); }
+
+async function doFoodSearch() {
+  const q = (foodQuery || "").trim();
+  if (!q) return;
+  foodResults = { loading: true, items: null }; render();
+  try {
+    const url = "https://world.openfoodfacts.org/cgi/search.pl?search_terms=" +
+      encodeURIComponent(q) + "&search_simple=1&action=process&json=1&page_size=20" +
+      "&fields=product_name,brands,nutriments";
+    const res = await fetch(url);
+    const data = await res.json();
+    const items = (data.products || []).map((p) => {
+      const n = p.nutriments || {};
+      return {
+        name: [p.product_name, p.brands].filter(Boolean).join(" · ") || "Unknown",
+        kcal: n["energy-kcal_100g"], protein: n.proteins_100g, carbs: n.carbohydrates_100g, fat: n.fat_100g,
+      };
+    }).filter((x) => x.kcal != null);
+    foodResults = { loading: false, items };
+  } catch (e) { foodResults = { loading: false, items: [], error: true }; }
+  render();
+}
+
+function pickSearchResult(i) {
+  const it = foodResults.items[i];
+  foodForm = {
+    name: it.name, kcal: Math.round(it.kcal || 0),
+    protein: round1(it.protein), carbs: round1(it.carbs), fat: round1(it.fat),
+    _title: "Add food — values per 100 g, edit to your portion",
+  };
+  foodResults = null; render();
+}
+
+function parseNutrition(t) {
+  const s = String(t || "").replace(/\n/g, " ");
+  const num = (re) => { const m = s.match(re); return m ? parseFloat(m[m.length - 1]) : null; };
+  return {
+    kcal: num(/calories?\s*[:\-]?\s*([0-9]{1,4})/i) || num(/energy[^0-9]*([0-9]{2,4})\s*k?cal/i),
+    protein: num(/protein\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*g/i),
+    carbs: num(/(?:total\s+)?carbohydrate?s?\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*g/i),
+    fat: num(/(?:total\s+)?fat\s*[:\-]?\s*([0-9]+(?:\.[0-9]+)?)\s*g/i),
+  };
+}
+
+async function handleOcr(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  if (!window.Tesseract) { alert("OCR engine is still loading — try again in a moment."); return; }
+  ocrBusy = true; foodForm = null; foodResults = null; render();
+  try {
+    const { data } = await Tesseract.recognize(file, "eng", {
+      logger: (m) => { if (m.status === "recognizing text") setSync("OCR " + Math.round(m.progress * 100) + "%", "busy"); },
+    });
+    const p = parseNutrition(data.text);
+    foodForm = {
+      name: "", kcal: p.kcal || "", protein: p.protein || "", carbs: p.carbs || "", fat: p.fat || "",
+      _title: "Add food — from photo, check the values", _raw: (data.text || "").trim(),
+    };
+    setSync("Synced ✓", "ok");
+  } catch (e) { alert("Couldn't read that image. Try a clearer, closer photo of the label."); setSync("Synced ✓", "ok"); }
+  ocrBusy = false; render();
+}
+
+function renderFoodForm() {
+  const f = foodForm;
+  const mi = (label, field, mode) =>
+    `<div><label class="fld">${label}</label><input class="input" inputmode="${mode}" value="${escapeHtml(f[field])}" oninput="foodFormInput('${field}',this.value)" /></div>`;
+  return `<div class="card">
+    <div class="section-title" style="margin:0 0 8px">${escapeHtml(f._title || "Add food")}</div>
+    <label class="fld">Name</label>
+    <input class="input" value="${escapeHtml(f.name)}" oninput="foodFormInput('name',this.value)" placeholder="e.g. Chicken &amp; rice" />
+    <div class="macro-inputs">
+      ${mi("Calories", "kcal", "numeric")}
+      ${mi("Protein (g)", "protein", "decimal")}
+      ${mi("Carbs (g)", "carbs", "decimal")}
+      ${mi("Fat (g)", "fat", "decimal")}
+    </div>
+    ${f._raw ? `<details style="margin-top:10px"><summary class="muted" style="font-size:12px">Show OCR text</summary><pre class="ocr-raw">${escapeHtml(f._raw)}</pre></details>` : ""}
+    <div style="height:12px"></div>
+    <button class="btn green" onclick="addFoodEntry()">Add to ${sameDay(foodDate) ? "today" : fmtDate(foodDate)}</button>
+    <div style="height:8px"></div>
+    <button class="btn ghost" onclick="closeFoodForm()">Cancel</button>
+  </div>`;
+}
+
+function renderSearchPanel() {
+  const r = foodResults;
+  let body = "";
+  if (r.loading) body = `<div class="muted">Searching…</div>`;
+  else if (r.error) body = `<div class="muted">Search failed — check your connection.</div>`;
+  else if (r.items && r.items.length === 0) body = `<div class="muted">No results.</div>`;
+  else if (r.items) body = r.items.map((it, i) => `<button class="result" onclick="pickSearchResult(${i})">
+      <div style="font-weight:600">${escapeHtml(it.name)}</div>
+      <div class="muted" style="font-size:12px">${Math.round(it.kcal)} kcal · ${round1(it.protein)}p ${round1(it.carbs)}c ${round1(it.fat)}f <span style="opacity:.6">/100 g</span></div>
+    </button>`).join("");
+  return `<div class="card">
+    <div class="row" style="gap:8px">
+      <input class="input" id="foodSearch" value="${escapeHtml(foodQuery)}" placeholder="Search foods…" enterkeyhint="search"
+        oninput="setFoodQuery(this.value)" onkeydown="if(event.key==='Enter')doFoodSearch()" />
+      <button class="btn primary" style="width:auto;padding:12px 16px" onclick="doFoodSearch()">Go</button>
+    </div>
+    <div class="muted" style="font-size:11px;margin-top:6px">Powered by Open Food Facts (free).</div>
+    <div style="height:10px"></div>
+    ${body}
+    <div style="height:10px"></div>
+    <button class="btn ghost sm" onclick="closeFoodForm()">Close</button>
+  </div>`;
+}
+
+function renderFood() {
+  document.getElementById("title").textContent = "Nutrition";
+  const g = state.goals || EMPTY_GOALS;
+  const t = foodTotals(foodDate);
+  const kcalGoal = Number(g.calories) || 0;
+  const remaining = kcalGoal ? kcalGoal - Math.round(t.kcal) : null;
+  const pct = kcalGoal ? Math.min(100, Math.round((t.kcal / kcalGoal) * 100)) : 0;
+  const entries = foodEntriesFor(foodDate).slice().reverse();
+
+  const summary = `<div class="card">
+    <div class="row between">
+      <button class="iconbtn" onclick="changeFoodDate(-1)">◀</button>
+      <strong>${sameDay(foodDate) ? "Today" : fmtDate(foodDate)}</strong>
+      <button class="iconbtn" onclick="changeFoodDate(1)" ${sameDay(foodDate) ? 'disabled style="opacity:.25"' : ""}>▶</button>
+    </div>
+    <div class="cal-summary">
+      <div class="cal-num">${Math.round(t.kcal)}</div>
+      <div class="cal-sub">${kcalGoal ? "of " + kcalGoal + " kcal" : "kcal"}</div>
+    </div>
+    ${kcalGoal ? `<div class="bar big"><div class="bar-fill" style="width:${pct}%;background:${remaining < 0 ? "var(--danger)" : "var(--accent)"}"></div></div>
+      <div class="muted" style="text-align:center;font-size:12px;margin-top:6px">${remaining >= 0 ? remaining + " kcal left" : (-remaining) + " kcal over"}</div>` : ""}
+    <div style="height:14px"></div>
+    ${macroBar("Protein", t.protein, Number(g.protein) || 0, "var(--accent-2)")}
+    ${macroBar("Carbs", t.carbs, Number(g.carbs) || 0, "#f0b64c")}
+    ${macroBar("Fat", t.fat, Number(g.fat) || 0, "#f87171")}
+    ${kcalGoal ? "" : `<div class="muted" style="font-size:12px;margin-top:6px">Set a daily goal in <b>Settings</b> to see targets.</div>`}
+  </div>`;
+
+  const actions = `<div class="grid3">
+    <label class="btn ghost foodbtn">📷 Scan<input type="file" accept="image/*" style="display:none" onchange="handleOcr(event)" /></label>
+    <button class="btn ghost" onclick="openFoodSearch()">🔍 Search</button>
+    <button class="btn ghost" onclick="openManualFood()">✏️ Manual</button>
+  </div>`;
+
+  let panel = "";
+  if (ocrBusy) panel = `<div class="card"><div class="row" style="gap:12px"><div class="spinner"></div><div style="font-size:14px">Reading image… the first scan downloads the OCR engine (a few MB), so give it a moment.</div></div></div>`;
+  else if (foodForm) panel = renderFoodForm();
+  else if (foodResults) panel = renderSearchPanel();
+
+  const list = entries.length
+    ? entries.map((f) => `<div class="card food-item">
+        <div class="row between">
+          <div style="min-width:0">
+            <div style="font-weight:600;overflow:hidden;text-overflow:ellipsis">${escapeHtml(f.name)}</div>
+            <div class="muted" style="font-size:12px">${f.protein || 0}p · ${f.carbs || 0}c · ${f.fat || 0}f</div>
+          </div>
+          <div class="row" style="gap:12px">
+            <div style="font-weight:800;white-space:nowrap">${f.kcal}<span class="muted" style="font-weight:400;font-size:11px"> kcal</span></div>
+            <button class="iconbtn" title="Remove" onclick="removeFood('${f.id}')">✕</button>
+          </div>
+        </div>
+      </div>`).join("")
+    : `<div class="empty"><div class="em">🍎</div>Nothing logged ${sameDay(foodDate) ? "today" : "this day"} yet.<br>Use Scan, Search, or Manual above.</div>`;
+
+  view().innerHTML = summary + actions + panel + `<div class="section-title">Logged</div>` + list;
+}
+
 /* --- SETTINGS --- */
 function renderSettings() {
   document.getElementById("title").textContent = "Settings";
@@ -471,6 +712,18 @@ function renderSettings() {
       <button class="btn primary" onclick="saveSettings()">Save &amp; sync now</button>
       <div style="height:8px"></div>
       <button class="btn ghost" onclick="pull()">Pull from cloud</button>
+    </div>
+
+    <div class="card">
+      <div class="section-title" style="margin:0 0 8px">Daily nutrition goals</div>
+      <div class="macro-inputs">
+        <div><label class="fld">Calories</label><input class="input" id="goalCal" inputmode="numeric" value="${state.goals.calories || ""}" placeholder="e.g. 2600" /></div>
+        <div><label class="fld">Protein (g)</label><input class="input" id="goalPro" inputmode="numeric" value="${state.goals.protein || ""}" placeholder="e.g. 180" /></div>
+        <div><label class="fld">Carbs (g)</label><input class="input" id="goalCarb" inputmode="numeric" value="${state.goals.carbs || ""}" placeholder="e.g. 300" /></div>
+        <div><label class="fld">Fat (g)</label><input class="input" id="goalFat" inputmode="numeric" value="${state.goals.fat || ""}" placeholder="e.g. 80" /></div>
+      </div>
+      <div style="height:12px"></div>
+      <button class="btn primary" onclick="saveGoals()">Save goals</button>
     </div>
 
     <div class="card">
@@ -501,6 +754,17 @@ function saveSettings() {
   pull();
 }
 
+function saveGoals() {
+  state.goals = {
+    calories: Math.round(Number(document.getElementById("goalCal").value) || 0),
+    protein: Math.round(Number(document.getElementById("goalPro").value) || 0),
+    carbs: Math.round(Number(document.getElementById("goalCarb").value) || 0),
+    fat: Math.round(Number(document.getElementById("goalFat").value) || 0),
+  };
+  commit();
+  toast("Goals saved");
+}
+
 function exportData() {
   const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
@@ -516,7 +780,7 @@ function importData(ev) {
     try {
       const data = JSON.parse(reader.result);
       if (!Array.isArray(data.sessions)) throw new Error();
-      state = { sessions: data.sessions, updatedAt: Date.now() };
+      state = normalizeState({ ...data, updatedAt: Date.now() });
       saveStateLocal(); queuePush(); render(); toast("Imported ✓");
     } catch (e) { alert("Invalid backup file."); }
   };
@@ -619,4 +883,7 @@ Object.assign(window, {
   startWorkout, cancelDraft, finishWorkout, setVal, addSet, removeSet,
   editSession, deleteSession, onPickExercise, saveSettings, exportData, importData,
   pull, go, render, logout, showLogin, doLogin,
+  // nutrition
+  changeFoodDate, openManualFood, openFoodSearch, closeFoodForm, foodFormInput,
+  setFoodQuery, addFoodEntry, removeFood, doFoodSearch, pickSearchResult, handleOcr, saveGoals,
 });
