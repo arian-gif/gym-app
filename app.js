@@ -14,14 +14,15 @@ const API_BASE = () => localStorage.getItem(LS_API) || "/api/data";
 const TOKEN = () => localStorage.getItem(LS_TOKEN) || "";
 
 /* ---------- state ---------- */
-let state = loadState();         // { sessions: [...], updatedAt: number }
+// Declared before loadState() runs below — loadState -> normalizeState reads it.
+const EMPTY_GOALS = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+
+let state = loadState();         // { sessions, foodLog, goals, updatedAt }
 let draft = loadDraft();         // in-progress session or null
 let activeTab = "train";
 let pushTimer = null;
 
 function go(tab) { activeTab = tab; render(); }
-
-const EMPTY_GOALS = { calories: 0, protein: 0, carbs: 0, fat: 0 };
 
 function normalizeState(s) {
   if (!s || !Array.isArray(s.sessions)) s = { sessions: [], updatedAt: 0 };
