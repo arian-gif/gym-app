@@ -144,12 +144,25 @@ function lastSession(workout) {
     .filter((s) => s.workout === workout)
     .sort((a, b) => (a.date < b.date ? 1 : -1))[0];
 }
-// previous set values for an exercise within a workout's last session
-function prevSets(workout, name, note) {
-  const s = lastSession(workout);
-  if (!s) return null;
-  const e = s.entries.find((x) => exKey(x.name, x.note) === exKey(name, note));
-  return e ? e.sets : null;
+// heaviest set for an exercise across ALL workouts in the last `days` days.
+// "Heaviest" = max weight, ties broken by more reps. For timed exercises
+// (weight 0) this falls through to the longest hold. Returns {weight,reps,date} or null.
+function bestRecentSet(name, note, days = 30) {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutoffISO = cutoff.toLocaleDateString("en-CA");
+  let best = null;
+  state.sessions.forEach((s) => {
+    if (s.date < cutoffISO) return;
+    const e = s.entries.find((x) => exKey(x.name, x.note) === exKey(name, note));
+    if (!e) return;
+    e.sets.forEach((st) => {
+      if (!best || st.weight > best.weight || (st.weight === best.weight && st.reps > best.reps)) {
+        best = { weight: st.weight, reps: st.reps, date: s.date };
+      }
+    });
+  });
+  return best;
 }
 
 function toast(msg) {
@@ -256,44 +269,45 @@ function renderTrain() {
 
   // active draft
   const ex = draft.entries.map((e, ei) => {
-    const prev = prevSets(draft.workout, e.name, e.note);
+    const best = bestRecentSet(e.name, e.note);
+    const bestStr = best ? (e.timed ? `${best.reps}s` : `${best.weight} × ${best.reps}`) : null;
     const setsHtml = e.sets.map((s, si) => {
       if (e.timed) {
-        const p = prev && prev[si] ? `${prev[si].reps}s` : "—";
         return `<div class="setrow timed">
           <div class="lbl">Set ${si + 1}</div>
           <div class="field" style="grid-column:2 / 4">
-            <input inputmode="numeric" placeholder="${prev && prev[si] ? prev[si].reps : ""}"
+            <input inputmode="numeric" placeholder="${best ? best.reps : ""}"
               value="${s.reps}" onchange="setVal(${ei},${si},'reps',this.value)" />
             <span class="unit">sec</span>
           </div>
           <button class="iconbtn" title="Remove set" onclick="removeSet(${ei},${si})">✕</button>
-        </div>
-        <div class="prev">prev: ${p}</div>`;
+        </div>`;
       }
-      const p = prev && prev[si] ? `${prev[si].weight}×${prev[si].reps}` : "—";
       return `<div class="setrow">
         <div class="lbl">Set ${si + 1}</div>
         <div class="field">
-          <input inputmode="decimal" placeholder="${prev && prev[si] ? prev[si].weight : ""}"
+          <input inputmode="decimal" placeholder="${best ? best.weight : ""}"
             value="${s.weight}" onchange="setVal(${ei},${si},'weight',this.value)" />
           <span class="unit">${UNIT}</span>
         </div>
         <div class="field">
-          <input inputmode="numeric" placeholder="${prev && prev[si] ? prev[si].reps : ""}"
+          <input inputmode="numeric" placeholder="${best ? best.reps : ""}"
             value="${s.reps}" onchange="setVal(${ei},${si},'reps',this.value)" />
           <span class="unit">reps</span>
         </div>
         <button class="iconbtn" title="Remove set" onclick="removeSet(${ei},${si})">✕</button>
-      </div>
-      <div class="prev">prev: ${p}</div>`;
+      </div>`;
     }).join("");
     const colhead = e.timed
       ? `<div class="colhead"><span></span><span style="grid-column:2 / 4">Seconds</span><span></span></div>`
       : `<div class="colhead"><span></span><span>Weight</span><span>Reps</span><span></span></div>`;
+    const bestLine = bestStr
+      ? `<div class="best">🏆 30-day best: <b>${bestStr}</b></div>`
+      : `<div class="best muted">No lifts logged in the last 30 days</div>`;
     return `<div class="card ex">
       <h3>${e.name}</h3>
       ${e.note ? `<div class="cue">${e.note}</div>` : ""}
+      ${bestLine}
       ${colhead}
       ${setsHtml}
       <button class="btn sm ghost" onclick="addSet(${ei})">+ Add set</button>
