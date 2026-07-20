@@ -3,7 +3,8 @@
     "Upper A",
     "Lower A",
     "Upper B",
-    "Lower B"
+    "Lower B",
+    "Posture Fix"
   ],
   "workouts": {
     "Upper A": [
@@ -156,6 +157,45 @@
         "name": "Neck Curls",
         "sets": 3,
         "note": "Lie on bench, plate on forehead"
+      }
+    ],
+    "Posture Fix": [
+      {
+        "name": "Cat-Cow",
+        "sets": 1,
+        "note": "~10 slow reps, breathe through each phase"
+      },
+      {
+        "name": "Kneeling Hip Flexor Stretch",
+        "sets": 2,
+        "timed": true,
+        "note": "Per side — tuck pelvis + squeeze glute (30-45s)"
+      },
+      {
+        "name": "Doorway Chest Stretch",
+        "sets": 2,
+        "timed": true,
+        "note": "Per side — elbow at shoulder height (30s)"
+      },
+      {
+        "name": "Glute Bridges",
+        "sets": 3,
+        "note": "3s pause at top, posterior tilt, ribs down"
+      },
+      {
+        "name": "Dead Bugs",
+        "sets": 3,
+        "note": "Per side — low back pressed to floor"
+      },
+      {
+        "name": "Wall Angels",
+        "sets": 2,
+        "note": "Low back & wrists on wall, slow"
+      },
+      {
+        "name": "Band Pull-Aparts",
+        "sets": 3,
+        "note": "15-20 reps, squeeze 1s"
       }
     ]
   }
