@@ -4,7 +4,7 @@
 window.WORKOUTS = {
   "Upper A": [
     { name: "Machine Chest Press", sets: 2 },
-    { name: "Lat Pulldowns", sets: 2 },
+    { name: "Straight-Arm Cable Pulldowns", sets: 2 },
     { name: "Machine Overhead Press", sets: 2 },
     { name: "Cable Seated Rows", sets: 2 },
     { name: "Pec Deck Flys", sets: 2 },
