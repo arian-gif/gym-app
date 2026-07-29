@@ -20,7 +20,7 @@ window.WORKOUTS = {
     { name: "Machine Calf Raises", sets: 3 },
     { name: "Heavy Cable Crunches", sets: 3 },
     { name: "Hanging Leg Raises", sets: 3, note: "To failure" },
-    { name: "Cable Woodchoppers", sets: 3, note: "8-12 reps per side" },
+    { name: "Russian Twists", sets: 3, note: "Weighted, 10-15 per side" },
     { name: "Neck Extensions", sets: 3, note: "Use a neck harness or plate behind the head" },
   ],
   "Upper B": [
@@ -40,7 +40,7 @@ window.WORKOUTS = {
     { name: "Leg Press Calf Raises", sets: 3 },
     { name: "Hanging Leg Raises", sets: 3, note: "To failure" },
     { name: "Cable Crunches", sets: 3 },
-    { name: "Cable Woodchoppers", sets: 3, note: "8-12 reps per side" },
+    { name: "Russian Twists", sets: 3, note: "Weighted, 10-15 per side" },
     { name: "Neck Curls", sets: 3, note: "Lie on bench, plate on forehead" },
   ],
   "Posture Fix": [
