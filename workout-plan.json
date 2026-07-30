@@ -13,8 +13,9 @@
         "sets": 2
       },
       {
-        "name": "Straight-Arm Cable Pulldowns",
-        "sets": 2
+        "name": "Weighted Pull-Ups",
+        "sets": 2,
+        "note": "Log added weight (belt); 0 = bodyweight"
       },
       {
         "name": "Machine Overhead Press",
