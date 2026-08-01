@@ -31,11 +31,23 @@
       },
       {
         "name": "Cable Tricep Pushdowns",
-        "sets": 2
+        "sets": 3,
+        "note": "Increased to 3 sets for hypertrophy"
+      },
+      {
+        "name": "Cross-Body Cable Tricep Extensions",
+        "sets": 3,
+        "note": "Focus on lateral head"
       },
       {
         "name": "Machine Preacher Curls",
-        "sets": 2
+        "sets": 3,
+        "note": "Increased to 3 sets for hypertrophy"
+      },
+      {
+        "name": "Incline Dumbbell Curls",
+        "sets": 3,
+        "note": "Bench at 45 degrees, deep stretch"
       },
       {
         "name": "Dumbbell Wrist Curls",
@@ -110,11 +122,23 @@
       },
       {
         "name": "Overhead Cable Tricep Extensions",
-        "sets": 2
+        "sets": 3,
+        "note": "Increased to 3 sets for hypertrophy"
+      },
+      {
+        "name": "EZ-Bar Skull Crushers",
+        "sets": 3,
+        "note": "Keep elbows tucked"
       },
       {
         "name": "Hammer Curls",
-        "sets": 2
+        "sets": 3,
+        "note": "Increased to 3 sets for hypertrophy"
+      },
+      {
+        "name": "Supinating Dumbbell Curls",
+        "sets": 3,
+        "note": "Twist wrists up at the top"
       },
       {
         "name": "Reverse Dumbbell Wrist Curls",
