@@ -21,8 +21,21 @@ let state = loadState();         // { sessions, foodLog, goals, updatedAt }
 let draft = loadDraft();         // in-progress session or null
 let activeTab = "train";
 let pushTimer = null;
+let elapsedTimer = null;   // live workout-duration ticker
 
 function go(tab) { activeTab = tab; render(); }
+
+function clearElapsedTimer() { if (elapsedTimer) { clearInterval(elapsedTimer); elapsedTimer = null; } }
+function startElapsedTimer() {
+  clearElapsedTimer();
+  const tick = () => {
+    const el = document.getElementById("wkElapsed");
+    if (!el || !draft || !draft.startedAt) { clearElapsedTimer(); return; }
+    el.textContent = fmtClock(Date.now() - draft.startedAt);
+  };
+  tick();
+  elapsedTimer = setInterval(tick, 1000);
+}
 
 function normalizeState(s) {
   if (!s || !Array.isArray(s.sessions)) s = { sessions: [], updatedAt: 0 };
@@ -138,6 +151,23 @@ function fmtDate(iso) {
   return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
 }
 
+// compact duration for History/stats, e.g. "48 min", "1h 12m"
+function fmtDur(sec) {
+  if (!sec || sec < 1) return "";
+  const m = Math.round(sec / 60);
+  if (m < 1) return sec + "s";
+  if (m < 60) return m + " min";
+  const h = Math.floor(m / 60), mm = m % 60;
+  return h + "h" + (mm ? " " + mm + "m" : "");
+}
+// live clock for the active workout, e.g. "12:05" or "1:04:22"
+function fmtClock(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  const p = (n) => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${p(m)}:${p(sec)}` : `${m}:${p(sec)}`;
+}
+
 // most recent saved session of a given workout (excludes the live draft)
 function lastSession(workout) {
   return state.sessions
@@ -181,6 +211,7 @@ function startWorkout(workout) {
     id: uid(),
     date: todayISO(),
     workout,
+    startedAt: Date.now(),
     entries: template.map((ex) => ({
       name: ex.name,
       note: ex.note || "",
@@ -215,7 +246,11 @@ function finishWorkout() {
     alert("Log at least one set before finishing.");
     return;
   }
-  const session = { id: draft.id, date: draft.date, workout: draft.workout, entries, savedAt: Date.now() };
+  // fresh workout: measure from startedAt. Editing an old session: keep its stored duration.
+  const durationSec = draft.startedAt
+    ? Math.max(1, Math.round((Date.now() - draft.startedAt) / 1000))
+    : (draft.durationSec || null);
+  const session = { id: draft.id, date: draft.date, workout: draft.workout, entries, savedAt: Date.now(), durationSec };
   // replace if editing an existing id, else add
   const i = state.sessions.findIndex((s) => s.id === session.id);
   if (i >= 0) state.sessions[i] = session; else state.sessions.push(session);
@@ -230,6 +265,7 @@ function finishWorkout() {
 const view = () => document.getElementById("view");
 
 function render() {
+  clearElapsedTimer();   // stop any running ticker; renderTrain restarts it if a draft is active
   document.querySelectorAll(".tab").forEach((b) =>
     b.classList.toggle("active", b.dataset.tab === activeTab)
   );
@@ -245,6 +281,8 @@ function render() {
 function renderTrain() {
   document.getElementById("title").textContent = draft ? draft.workout : "Gym Tracker";
   if (!draft) {
+    const durs = state.sessions.filter((s) => s.durationSec).map((s) => s.durationSec);
+    const avgDur = durs.length ? Math.round(durs.reduce((a, b) => a + b, 0) / durs.length) : 0;
     const cards = window.WORKOUT_ORDER.map((w) => {
       const last = lastSession(w);
       const cls = isUpper(w) ? "upper" : "lower";
@@ -261,6 +299,7 @@ function renderTrain() {
       <div class="card" style="margin-top:16px">
         <div class="row between">
           <div><div style="font-weight:700">${state.sessions.length}</div><div class="muted" style="font-size:12px">workouts logged</div></div>
+          ${avgDur ? `<div style="text-align:center"><div style="font-weight:700">${fmtDur(avgDur)}</div><div class="muted" style="font-size:12px">avg time</div></div>` : ""}
           <button class="btn sm ghost" onclick="go('progress')">View progress →</button>
         </div>
       </div>`;
@@ -314,14 +353,18 @@ function renderTrain() {
     </div>`;
   }).join("");
 
+  const timerHtml = draft.startedAt
+    ? ` · ⏱ <span id="wkElapsed">0:00</span>`
+    : (draft.durationSec ? ` · ⏱ ${fmtDur(draft.durationSec)}` : "");
   view().innerHTML = `
     <div class="card row between">
-      <div><strong>${draft.workout}</strong><div class="muted" style="font-size:12px">${fmtDate(draft.date)}</div></div>
+      <div><strong>${draft.workout}</strong><div class="muted" style="font-size:12px">${fmtDate(draft.date)}${timerHtml}</div></div>
       <button class="btn sm danger" onclick="cancelDraft()">Discard</button>
     </div>
     ${ex}
     <button class="btn green" onclick="finishWorkout()">✓ Finish &amp; Save Workout</button>
     <div style="height:8px"></div>`;
+  startElapsedTimer();
 }
 
 function setVal(ei, si, field, val) { draft.entries[ei].sets[si][field] = val; saveDraftLocal(); }
@@ -353,7 +396,7 @@ function renderHistory() {
     return `<div class="card">
       <div class="hist-item">
         <div><span class="badge ${cls}">${s.workout}</span></div>
-        <div class="muted" style="font-size:13px">${fmtDate(s.date)}</div>
+        <div class="muted" style="font-size:13px">${fmtDate(s.date)}${s.durationSec ? " · ⏱ " + fmtDur(s.durationSec) : ""}</div>
       </div>
       <hr class="sep">
       ${lines}
