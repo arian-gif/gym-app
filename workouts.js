@@ -32,7 +32,6 @@ window.WORKOUTS = {
     { name: "V-Bar Pulldowns", sets: 2, note: "Seated row grip" },
     { name: "Reverse Pec Deck", sets: 2 },
     { name: "Overhead Cable Tricep Extensions", sets: 3, note: "Increased to 3 sets for hypertrophy" },
-    { name: "EZ-Bar Skull Crushers", sets: 3, note: "Keep elbows tucked" },
     { name: "Hammer Curls", sets: 3, note: "Increased to 3 sets for hypertrophy" },
     { name: "Supinating Dumbbell Curls", sets: 3, note: "Twist wrists up at the top" },
     { name: "Reverse Dumbbell Wrist Curls", sets: 2, note: "Focus on extensors" },
