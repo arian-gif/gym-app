@@ -37,6 +37,78 @@ function startElapsedTimer() {
   elapsedTimer = setInterval(tick, 1000);
 }
 
+/* ---------- rest timer (between sets) ---------- */
+const LS_REST = "gym_rest_default";
+let restEndsAt = null;     // timestamp (ms) when the current rest ends, or null if idle
+let restTotalSec = 90;     // duration of the current/most-recent rest, for the progress bar
+let restInterval = null;
+let audioCtx = null;
+
+const restDefault = () => Number(localStorage.getItem(LS_REST)) || 90;
+
+function clearRestInterval() { if (restInterval) { clearInterval(restInterval); restInterval = null; } }
+
+function unlockAudio() {
+  // Must run inside a user gesture (the Start-rest tap) so the beep can fire later on iOS.
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch (e) {}
+}
+function beep() {
+  try {
+    if (!audioCtx) return;
+    [0, 0.18, 0.36].forEach((t) => {              // three short beeps
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type = "sine"; o.frequency.value = 880;
+      const start = audioCtx.currentTime + t;
+      g.gain.setValueAtTime(0.0001, start);
+      g.gain.exponentialRampToValueAtTime(0.35, start + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, start + 0.14);
+      o.start(start); o.stop(start + 0.15);
+    });
+  } catch (e) {}
+}
+
+function startRest(sec) {
+  restTotalSec = sec;
+  restEndsAt = Date.now() + sec * 1000;
+  localStorage.setItem(LS_REST, String(sec));   // remember last-used duration
+  unlockAudio();
+  render();                                     // swap idle bar -> running bar (restarts the interval)
+}
+function addRest(delta) {
+  if (restEndsAt == null) return;
+  restEndsAt += delta * 1000;
+  restTotalSec += delta;
+  tickRest();
+}
+function stopRest() { restEndsAt = null; clearRestInterval(); render(); }
+
+function tickRest() {
+  const disp = document.getElementById("restDisplay");
+  const fill = document.getElementById("restFill");
+  if (restEndsAt == null) { clearRestInterval(); return; }
+  const remMs = restEndsAt - Date.now();
+  if (remMs <= 0) {
+    beep();
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    restEndsAt = null; clearRestInterval();
+    toast("⏱ Rest over — go!");
+    render();
+    return;
+  }
+  if (disp) disp.textContent = fmtClock(remMs);
+  if (fill && restTotalSec) fill.style.width = Math.max(0, Math.min(100, (remMs / 1000) / restTotalSec * 100)) + "%";
+}
+function startRestInterval() {
+  clearRestInterval();
+  tickRest();
+  restInterval = setInterval(tickRest, 500);
+}
+function resetRest() { restEndsAt = null; clearRestInterval(); }
+
 function normalizeState(s) {
   if (!s || !Array.isArray(s.sessions)) s = { sessions: [], updatedAt: 0 };
   if (!Array.isArray(s.foodLog)) s.foodLog = [];
@@ -225,7 +297,7 @@ function startWorkout(workout) {
 
 function cancelDraft() {
   if (confirm("Discard this workout? Entered sets will be lost.")) {
-    draft = null; saveDraftLocal(); render();
+    draft = null; saveDraftLocal(); resetRest(); render();
   }
 }
 
@@ -255,7 +327,7 @@ function finishWorkout() {
   const i = state.sessions.findIndex((s) => s.id === session.id);
   if (i >= 0) state.sessions[i] = session; else state.sessions.push(session);
   commit();
-  draft = null; saveDraftLocal();
+  draft = null; saveDraftLocal(); resetRest();
   toast("Workout saved 💪");
   activeTab = "history";
   render();
@@ -266,6 +338,7 @@ const view = () => document.getElementById("view");
 
 function render() {
   clearElapsedTimer();   // stop any running ticker; renderTrain restarts it if a draft is active
+  clearRestInterval();   // same for the rest timer
   document.querySelectorAll(".tab").forEach((b) =>
     b.classList.toggle("active", b.dataset.tab === activeTab)
   );
@@ -356,15 +429,29 @@ function renderTrain() {
   const timerHtml = draft.startedAt
     ? ` · ⏱ <span id="wkElapsed">0:00</span>`
     : (draft.durationSec ? ` · ⏱ ${fmtDur(draft.durationSec)}` : "");
+  const d = restDefault();
+  const chip = (sec, label) => `<button class="chip${sec === d ? " primary" : ""}" onclick="startRest(${sec})">${label}</button>`;
+  const restBar = restEndsAt != null
+    ? `<div class="restbar running">
+         <div class="rest-time" id="restDisplay">${fmtClock(restEndsAt - Date.now())}</div>
+         <div class="rest-progress"><div id="restFill" class="rest-fill"></div></div>
+         <div class="rest-actions"><button class="chip" onclick="addRest(30)">+30s</button><button class="chip" onclick="stopRest()">Skip</button></div>
+       </div>`
+    : `<div class="restbar">
+         <span class="rest-label">Rest</span>
+         <div class="rest-presets">${chip(60, "1:00")}${chip(90, "1:30")}${chip(120, "2:00")}</div>
+       </div>`;
   view().innerHTML = `
     <div class="card row between">
       <div><strong>${draft.workout}</strong><div class="muted" style="font-size:12px">${fmtDate(draft.date)}${timerHtml}</div></div>
       <button class="btn sm danger" onclick="cancelDraft()">Discard</button>
     </div>
+    ${restBar}
     ${ex}
     <button class="btn green" onclick="finishWorkout()">✓ Finish &amp; Save Workout</button>
     <div style="height:8px"></div>`;
   startElapsedTimer();
+  if (restEndsAt != null) startRestInterval();
 }
 
 function setVal(ei, si, field, val) { draft.entries[ei].sets[si][field] = val; saveDraftLocal(); }
@@ -944,4 +1031,6 @@ Object.assign(window, {
   // nutrition
   changeFoodDate, openManualFood, openFoodSearch, closeFoodForm, foodFormInput,
   setFoodQuery, addFoodEntry, removeFood, doFoodSearch, pickSearchResult, handleOcr, saveGoals,
+  // rest timer
+  startRest, addRest, stopRest,
 });

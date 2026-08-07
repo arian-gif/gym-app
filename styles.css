@@ -173,6 +173,27 @@ select, .input {
 .login-card .btn { margin-top: 4px; }
 .login-err { color: var(--danger); font-size: 13px; min-height: 18px; margin: 8px 0; }
 
+/* Rest timer */
+.restbar {
+  position: sticky; top: calc(56px + var(--safe-top) + 8px); z-index: 15;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 12px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px; justify-content: space-between;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+.restbar .rest-label { font-size: 13px; color: var(--muted); font-weight: 600; }
+.rest-presets, .rest-actions { display: flex; gap: 8px; }
+.chip {
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text);
+  font-size: 14px; font-weight: 700; padding: 8px 14px; border-radius: 999px; cursor: pointer;
+}
+.chip.primary { background: var(--accent); color: #04222e; border-color: transparent; }
+.chip:active { transform: scale(0.96); }
+.restbar.running { flex-wrap: wrap; }
+.rest-time { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); min-width: 76px; }
+.rest-progress { flex: 1 1 100%; order: 3; height: 6px; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+.rest-fill { height: 100%; width: 100%; background: var(--accent); border-radius: 999px; transition: width .4s linear; }
+
 /* Nutrition / Food */
 .cal-summary { text-align: center; margin: 14px 0 10px; }
 .cal-num { font-size: 44px; font-weight: 800; line-height: 1; }
