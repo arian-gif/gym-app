@@ -35,14 +35,14 @@
         "note": "Increased to 3 sets for hypertrophy"
       },
       {
-        "name": "Cross-Body Cable Tricep Extensions",
-        "sets": 3,
-        "note": "Focus on lateral head"
-      },
-      {
         "name": "Machine Preacher Curls",
         "sets": 3,
         "note": "Increased to 3 sets for hypertrophy"
+      },
+      {
+        "name": "Cross-Body Cable Tricep Extensions",
+        "sets": 3,
+        "note": "Focus on lateral head"
       },
       {
         "name": "Incline Dumbbell Curls",
@@ -121,12 +121,12 @@
         "sets": 2
       },
       {
-        "name": "Overhead Cable Tricep Extensions",
+        "name": "Preacher Hammer Curls",
         "sets": 3,
         "note": "Increased to 3 sets for hypertrophy"
       },
       {
-        "name": "Hammer Curls",
+        "name": "Overhead Cable Tricep Extensions",
         "sets": 3,
         "note": "Increased to 3 sets for hypertrophy"
       },
