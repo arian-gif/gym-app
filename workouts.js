@@ -8,9 +8,10 @@ window.WORKOUTS = {
     { name: "Machine Overhead Press", sets: 2 },
     { name: "Cable Seated Rows", sets: 2 },
     { name: "Pec Deck Flys", sets: 2 },
+    // Alternating Arms to avoid fatigue:
     { name: "Cable Tricep Pushdowns", sets: 3, note: "Increased to 3 sets for hypertrophy" },
-    { name: "Cross-Body Cable Tricep Extensions", sets: 3, note: "Focus on lateral head" },
     { name: "Machine Preacher Curls", sets: 3, note: "Increased to 3 sets for hypertrophy" },
+    { name: "Cross-Body Cable Tricep Extensions", sets: 3, note: "Focus on lateral head" },
     { name: "Incline Dumbbell Curls", sets: 3, note: "Bench at 45 degrees, deep stretch" },
     { name: "Dumbbell Wrist Curls", sets: 2, note: "Rest forearms on bench, focus on flexors" },
   ],
@@ -27,12 +28,13 @@ window.WORKOUTS = {
   ],
   "Upper B": [
     { name: "Incline Smith Machine Press", sets: 2, note: "or Dumbbells" },
-    { name: "Chest-Supported Machine Rows", sets: 2 },
+    { name: "Weighted Pull-Ups", sets: 2, note: "Log added weight (belt); 0 = bodyweight" },
     { name: "Cable Lateral Raises", sets: 2 },
-    { name: "V-Bar Pulldowns", sets: 2, note: "Seated row grip" },
+    { name: "T-Bar Rows", sets: 2 },
     { name: "Reverse Pec Deck", sets: 2 },
+    // Alternating Arms to avoid fatigue:
+    { name: "Preacher Hammer Curls", sets: 3, note: "Increased to 3 sets for hypertrophy" },
     { name: "Overhead Cable Tricep Extensions", sets: 3, note: "Increased to 3 sets for hypertrophy" },
-    { name: "Hammer Curls", sets: 3, note: "Increased to 3 sets for hypertrophy" },
     { name: "Supinating Dumbbell Curls", sets: 3, note: "Twist wrists up at the top" },
     { name: "Reverse Dumbbell Wrist Curls", sets: 2, note: "Focus on extensors" },
   ],
