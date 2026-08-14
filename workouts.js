@@ -28,9 +28,9 @@ window.WORKOUTS = {
   ],
   "Upper B": [
     { name: "Incline Smith Machine Press", sets: 2, note: "or Dumbbells" },
-    { name: "T-Bar Rows", sets: 2 },
-    { name: "Cable Lateral Raises", sets: 2 },
     { name: "Weighted Pull-Ups", sets: 2, note: "Log added weight (belt); 0 = bodyweight" },
+    { name: "Cable Lateral Raises", sets: 2 },
+    { name: "T-Bar Rows", sets: 2 },
     { name: "Reverse Pec Deck", sets: 2 },
     // Alternating Arms to avoid fatigue:
     { name: "Preacher Hammer Curls", sets: 3, note: "Increased to 3 sets for hypertrophy" },

@@ -104,17 +104,17 @@
         "note": "or Dumbbells"
       },
       {
-        "name": "T-Bar Rows",
-        "sets": 2
+        "name": "Weighted Pull-Ups",
+        "sets": 2,
+        "note": "Log added weight (belt); 0 = bodyweight"
       },
       {
         "name": "Cable Lateral Raises",
         "sets": 2
       },
       {
-        "name": "Weighted Pull-Ups",
-        "sets": 2,
-        "note": "Log added weight (belt); 0 = bodyweight"
+        "name": "T-Bar Rows",
+        "sets": 2
       },
       {
         "name": "Reverse Pec Deck",
