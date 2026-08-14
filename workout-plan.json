@@ -104,7 +104,7 @@
         "note": "or Dumbbells"
       },
       {
-        "name": "Chest-Supported Machine Rows",
+        "name": "T-Bar Rows",
         "sets": 2
       },
       {
@@ -112,9 +112,9 @@
         "sets": 2
       },
       {
-        "name": "V-Bar Pulldowns",
+        "name": "Weighted Pull-Ups",
         "sets": 2,
-        "note": "Seated row grip"
+        "note": "Log added weight (belt); 0 = bodyweight"
       },
       {
         "name": "Reverse Pec Deck",
