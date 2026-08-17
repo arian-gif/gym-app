@@ -213,7 +213,7 @@ async function push() {
 /* ---------- helpers ---------- */
 const todayISO = () => new Date().toLocaleDateString("en-CA"); // yyyy-mm-dd local
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-const isUpper = (w) => w.toLowerCase().startsWith("upper");
+const isUpper = (w) => w.toLowerCase().includes("upper");
 const epley = (wt, reps) => (wt > 0 && reps > 0 ? Math.round(wt * (1 + reps / 30)) : 0);
 
 function exKey(name, note) { return name + (note ? "|" + note : ""); }

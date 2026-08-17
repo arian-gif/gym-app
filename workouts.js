@@ -48,6 +48,26 @@ window.WORKOUTS = {
     { name: "Russian Twists", sets: 3, note: "Weighted, 10-15 per side" },
     { name: "Neck Curls", sets: 3, note: "Lie on bench, plate on forehead" },
   ],
+  // Auto-regulated "sore/tired" days: manufacture sleep pressure, flush metabolic
+  // waste from full-court basketball, and hold onto muscle without taxing the CNS.
+  // Rules: zero spinal loading, fixed paths (machines/cables) only, RPE 7 max
+  // (stop 3-4 reps short of failure), and alternate biceps/triceps.
+  "Sore Upper": [
+    { name: "Machine Chest Press", sets: 3, note: "10-12 @ RPE 7 — smooth tempo, no violent lockout" },
+    { name: "Chest-Supported Machine Row", sets: 3, note: "10-12 @ RPE 7 — chest glued to the pad" },
+    { name: "Cable Lateral Raises", sets: 3, note: "12-15 — light, pure side delt contraction" },
+    // Alternating Arms to avoid fatigue:
+    { name: "Cable Bicep Curls", sets: 2, note: "12-15 — first arm movement" },
+    { name: "Cable Tricep Pushdowns", sets: 2, note: "12-15 — alternate to triceps" },
+    { name: "Hammer Curls", sets: 2, note: "12-15 — dumbbell or cable, neutral grip to protect elbows" },
+  ],
+  "Sore Lower": [
+    { name: "Seated Leg Curls", sets: 3, note: "12-15 — first, pump blood into the knees before pressing" },
+    { name: "Leg Press", sets: 3, note: "10-12 @ RPE 7 — feet high, never let the sled crash down" },
+    { name: "Leg Extensions", sets: 3, note: "12-15 — light, half-second pause at the top" },
+    { name: "Seated Calf Raises", sets: 3, note: "12-15 — deep stretch at the bottom for ankle mobility" },
+    { name: "Machine Crunches", sets: 2, note: "12-15 — light core, zero lower back strain" },
+  ],
   "Posture Fix": [
     // Release
     { name: "Cat-Cow", sets: 1, note: "~10 slow reps, breathe through each phase" },
@@ -61,4 +81,4 @@ window.WORKOUTS = {
   ],
 };
 
-window.WORKOUT_ORDER = ["Upper A", "Lower A", "Upper B", "Lower B", "Posture Fix"];
+window.WORKOUT_ORDER = ["Upper A", "Lower A", "Upper B", "Lower B", "Sore Upper", "Sore Lower", "Posture Fix"];
