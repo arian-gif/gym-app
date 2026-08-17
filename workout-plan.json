@@ -4,6 +4,8 @@
     "Lower A",
     "Upper B",
     "Lower B",
+    "Sore Upper",
+    "Sore Lower",
     "Posture Fix"
   ],
   "workouts": {
@@ -177,6 +179,65 @@
         "name": "Neck Curls",
         "sets": 3,
         "note": "Lie on bench, plate on forehead"
+      }
+    ],
+    "Sore Upper": [
+      {
+        "name": "Machine Chest Press",
+        "sets": 3,
+        "note": "10-12 @ RPE 7 — smooth tempo, no violent lockout"
+      },
+      {
+        "name": "Chest-Supported Machine Row",
+        "sets": 3,
+        "note": "10-12 @ RPE 7 — chest glued to the pad"
+      },
+      {
+        "name": "Cable Lateral Raises",
+        "sets": 3,
+        "note": "12-15 — light, pure side delt contraction"
+      },
+      {
+        "name": "Cable Bicep Curls",
+        "sets": 2,
+        "note": "12-15 — first arm movement"
+      },
+      {
+        "name": "Cable Tricep Pushdowns",
+        "sets": 2,
+        "note": "12-15 — alternate to triceps"
+      },
+      {
+        "name": "Hammer Curls",
+        "sets": 2,
+        "note": "12-15 — dumbbell or cable, neutral grip to protect elbows"
+      }
+    ],
+    "Sore Lower": [
+      {
+        "name": "Seated Leg Curls",
+        "sets": 3,
+        "note": "12-15 — first, pump blood into the knees before pressing"
+      },
+      {
+        "name": "Leg Press",
+        "sets": 3,
+        "note": "10-12 @ RPE 7 — feet high, never let the sled crash down"
+      },
+      {
+        "name": "Leg Extensions",
+        "sets": 3,
+        "note": "12-15 — light, half-second pause at the top"
+      },
+      {
+        "name": "Seated Calf Raises",
+        "sets": 3,
+        "note": "12-15 — deep stretch at the bottom for ankle mobility"
+      },
+      {
+        "name": "Machine Crunches",
+        "sets": 2,
+        "note": "12-15 — light core, zero lower back strain"
       }
     ],
     "Posture Fix": [
