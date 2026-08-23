@@ -32,9 +32,9 @@
         "sets": 2
       },
       {
-        "name": "Cable Tricep Pushdowns",
+        "name": "1-Arm Neutral Grip Cable Pushdowns",
         "sets": 3,
-        "note": "Increased to 3 sets for hypertrophy"
+        "note": "Medial head focus — neutral grip, zero wrist torque"
       },
       {
         "name": "Machine Preacher Curls",
@@ -136,6 +136,11 @@
         "name": "Supinating Dumbbell Curls",
         "sets": 3,
         "note": "Twist wrists up at the top"
+      },
+      {
+        "name": "Incline Dumbbell Skull Crushers",
+        "sets": 3,
+        "note": "Long head stretch — bench at 45 degrees, wrists rotate freely"
       },
       {
         "name": "Reverse Dumbbell Wrist Curls",
