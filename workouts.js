@@ -9,10 +9,10 @@ window.WORKOUTS = {
     { name: "Cable Seated Rows", sets: 2 },
     { name: "Pec Deck Flys", sets: 2 },
     // Alternating Arms to avoid fatigue:
-    { name: "1-Arm Neutral Grip Cable Pushdowns", sets: 3, note: "Medial head focus — neutral grip, zero wrist torque" },
-    { name: "Machine Preacher Curls", sets: 3, note: "Increased to 3 sets for hypertrophy" },
-    { name: "Cross-Body Cable Tricep Extensions", sets: 3, note: "Focus on lateral head" },
-    { name: "Incline Dumbbell Curls", sets: 3, note: "Bench at 45 degrees, deep stretch" },
+    { name: "1-Arm Neutral Grip Cable Pushdowns", sets: 2, note: "Medial head focus — neutral grip, zero wrist torque" },
+    { name: "Machine Preacher Curls", sets: 2 },
+    { name: "Cross-Body Cable Tricep Extensions", sets: 2, note: "Focus on lateral head" },
+    { name: "Incline Dumbbell Curls", sets: 2, note: "Bench at 45 degrees, deep stretch" },
     { name: "Dumbbell Wrist Curls", sets: 2, note: "Rest forearms on bench, focus on flexors" },
   ],
   "Lower A": [
@@ -33,10 +33,10 @@ window.WORKOUTS = {
     { name: "T-Bar Rows", sets: 2 },
     { name: "Reverse Pec Deck", sets: 2 },
     // Alternating Arms to avoid fatigue:
-    { name: "Preacher Hammer Curls", sets: 3, note: "Increased to 3 sets for hypertrophy" },
-    { name: "Overhead Cable Tricep Extensions", sets: 3, note: "Increased to 3 sets for hypertrophy" },
-    { name: "Supinating Dumbbell Curls", sets: 3, note: "Twist wrists up at the top" },
-    { name: "Incline Dumbbell Skull Crushers", sets: 3, note: "Long head stretch — bench at 45 degrees, wrists rotate freely" },
+    { name: "Preacher Hammer Curls", sets: 2 },
+    { name: "Overhead Cable Tricep Extensions", sets: 2 },
+    { name: "Supinating Dumbbell Curls", sets: 2, note: "Twist wrists up at the top" },
+    { name: "Incline Dumbbell Skull Crushers", sets: 2, note: "Long head stretch — bench at 45 degrees, wrists rotate freely" },
     { name: "Reverse Dumbbell Wrist Curls", sets: 2, note: "Focus on extensors" },
   ],
   "Lower B": [
