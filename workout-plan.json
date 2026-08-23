@@ -33,22 +33,21 @@
       },
       {
         "name": "1-Arm Neutral Grip Cable Pushdowns",
-        "sets": 3,
+        "sets": 2,
         "note": "Medial head focus — neutral grip, zero wrist torque"
       },
       {
         "name": "Machine Preacher Curls",
-        "sets": 3,
-        "note": "Increased to 3 sets for hypertrophy"
+        "sets": 2
       },
       {
         "name": "Cross-Body Cable Tricep Extensions",
-        "sets": 3,
+        "sets": 2,
         "note": "Focus on lateral head"
       },
       {
         "name": "Incline Dumbbell Curls",
-        "sets": 3,
+        "sets": 2,
         "note": "Bench at 45 degrees, deep stretch"
       },
       {
@@ -124,22 +123,20 @@
       },
       {
         "name": "Preacher Hammer Curls",
-        "sets": 3,
-        "note": "Increased to 3 sets for hypertrophy"
+        "sets": 2
       },
       {
         "name": "Overhead Cable Tricep Extensions",
-        "sets": 3,
-        "note": "Increased to 3 sets for hypertrophy"
+        "sets": 2
       },
       {
         "name": "Supinating Dumbbell Curls",
-        "sets": 3,
+        "sets": 2,
         "note": "Twist wrists up at the top"
       },
       {
         "name": "Incline Dumbbell Skull Crushers",
-        "sets": 3,
+        "sets": 2,
         "note": "Long head stretch — bench at 45 degrees, wrists rotate freely"
       },
       {
