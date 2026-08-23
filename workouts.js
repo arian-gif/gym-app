@@ -42,7 +42,7 @@ window.WORKOUTS = {
   "Lower B": [
     { name: "Seated Leg Curls", sets: 3 },
     { name: "Leg Press", sets: 3, note: "Feet higher/wider for glutes/hams" },
-    { name: "Leg Extensions", sets: 3 },
+    { name: "Lying Leg Curls", sets: 3, note: "Hips flat on the pad, control the negative" },
     { name: "Calf Raises", sets: 3 },
     { name: "Hanging Leg Raises", sets: 3, note: "To failure" },
     { name: "Cable Crunches", sets: 3 },
