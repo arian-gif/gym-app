@@ -9,7 +9,7 @@ window.WORKOUTS = {
     { name: "Cable Seated Rows", sets: 2 },
     { name: "Pec Deck Flys", sets: 2 },
     // Alternating Arms to avoid fatigue:
-    { name: "1-Arm Neutral Grip Cable Pushdowns", sets: 2, note: "Medial head focus — neutral grip, zero wrist torque" },
+    { name: "Overhead Cable Tricep Extensions", sets: 2, note: "Long head — full stretch overhead, done first while fresh" },
     { name: "Machine Preacher Curls", sets: 2 },
     { name: "Cross-Body Cable Tricep Extensions", sets: 2, note: "Focus on lateral head" },
     { name: "Incline Dumbbell Curls", sets: 2, note: "Bench at 45 degrees, deep stretch" },
@@ -36,7 +36,7 @@ window.WORKOUTS = {
     { name: "Preacher Hammer Curls", sets: 2 },
     { name: "Overhead Cable Tricep Extensions", sets: 2 },
     { name: "Supinating Dumbbell Curls", sets: 2, note: "Twist wrists up at the top" },
-    { name: "Incline Dumbbell Skull Crushers", sets: 2, note: "Long head stretch — bench at 45 degrees, wrists rotate freely" },
+    { name: "1-Arm Neutral Grip Cable Pushdowns", sets: 2, note: "Medial head focus — neutral grip, zero wrist torque" },
     { name: "Reverse Dumbbell Wrist Curls", sets: 2, note: "Focus on extensors" },
   ],
   "Lower B": [
