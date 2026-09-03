@@ -24,6 +24,12 @@
         "sets": 2
       },
       {
+        "name": "Dead Hang",
+        "sets": 1,
+        "timed": true,
+        "note": "20-30s — decompress after overhead pressing"
+      },
+      {
         "name": "Cable Seated Rows",
         "sets": 2
       },
@@ -35,6 +41,12 @@
         "name": "Overhead Cable Tricep Extensions",
         "sets": 2,
         "note": "Long head — full stretch overhead, done first while fresh"
+      },
+      {
+        "name": "Dead Hang",
+        "sets": 1,
+        "timed": true,
+        "note": "20-30s — decompress after overhead extensions"
       },
       {
         "name": "Machine Preacher Curls",
@@ -54,13 +66,19 @@
         "name": "Dumbbell Wrist Curls",
         "sets": 2,
         "note": "Rest forearms on bench, focus on flexors"
+      },
+      {
+        "name": "Dead Hang",
+        "sets": 1,
+        "timed": true,
+        "note": "20-30s — end of session"
       }
     ],
     "Lower A": [
       {
-        "name": "Leg Press",
+        "name": "Low-Box Step-Ups",
         "sets": 3,
-        "note": "Feet lower/closer for quads"
+        "note": "Low box, drive through the heel, control the descent"
       },
       {
         "name": "Seated Leg Curls",
@@ -105,6 +123,12 @@
         "note": "or Dumbbells"
       },
       {
+        "name": "Dead Hang",
+        "sets": 1,
+        "timed": true,
+        "note": "20-30s — decompress after incline pressing"
+      },
+      {
         "name": "Weighted Pull-Ups",
         "sets": 2,
         "note": "Log added weight (belt); 0 = bodyweight"
@@ -114,8 +138,9 @@
         "sets": 2
       },
       {
-        "name": "T-Bar Rows",
-        "sets": 2
+        "name": "Seated Cable Rows",
+        "sets": 2,
+        "note": "No loaded spinal flexion"
       },
       {
         "name": "Reverse Pec Deck",
@@ -128,6 +153,12 @@
       {
         "name": "Overhead Cable Tricep Extensions",
         "sets": 2
+      },
+      {
+        "name": "Dead Hang",
+        "sets": 1,
+        "timed": true,
+        "note": "20-30s — decompress after overhead extensions"
       },
       {
         "name": "Supinating Dumbbell Curls",
@@ -143,6 +174,12 @@
         "name": "Reverse Dumbbell Wrist Curls",
         "sets": 2,
         "note": "Focus on extensors"
+      },
+      {
+        "name": "Dead Hang",
+        "sets": 1,
+        "timed": true,
+        "note": "20-30s — end of session"
       }
     ],
     "Lower B": [
@@ -151,9 +188,9 @@
         "sets": 3
       },
       {
-        "name": "Leg Press",
+        "name": "Machine Hip Thrusts",
         "sets": 3,
-        "note": "Feet higher/wider for glutes/hams"
+        "note": "Ribs down, full lockout, pause at the top"
       },
       {
         "name": "Lying Leg Curls",
