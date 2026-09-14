@@ -9,9 +9,13 @@ const LS_STATE = "gym_state_v1";
 const LS_DRAFT = "gym_draft_v1";
 const LS_TOKEN = "gym_token";
 const LS_API = "gym_api";
+const LS_GYM = "gym_location";
+const DEFAULT_GYM = "Fit4Less B (Waterloo)";
+const PRIOR_GYM = "Fit4Less A";        // where sessions logged before the move were done
 
 const API_BASE = () => localStorage.getItem(LS_API) || "/api/data";
 const TOKEN = () => localStorage.getItem(LS_TOKEN) || "";
+const currentGym = () => localStorage.getItem(LS_GYM) || DEFAULT_GYM;
 
 /* ---------- state ---------- */
 // Declared before loadState() runs below — loadState -> normalizeState reads it.
@@ -113,6 +117,8 @@ function normalizeState(s) {
   if (!s || !Array.isArray(s.sessions)) s = { sessions: [], updatedAt: 0 };
   if (!Array.isArray(s.foodLog)) s.foodLog = [];
   if (!s.goals || typeof s.goals !== "object") s.goals = { ...EMPTY_GOALS };
+  // sessions logged before gym tagging existed were all done at the prior gym
+  s.sessions.forEach((sess) => { if (!sess.gym) sess.gym = PRIOR_GYM; });
   return s;
 }
 
@@ -283,6 +289,7 @@ function startWorkout(workout) {
     id: uid(),
     date: todayISO(),
     workout,
+    gym: currentGym(),
     startedAt: Date.now(),
     entries: template.map((ex) => ({
       name: ex.name,
@@ -322,7 +329,7 @@ function finishWorkout() {
   const durationSec = draft.startedAt
     ? Math.max(1, Math.round((Date.now() - draft.startedAt) / 1000))
     : (draft.durationSec || null);
-  const session = { id: draft.id, date: draft.date, workout: draft.workout, entries, savedAt: Date.now(), durationSec };
+  const session = { id: draft.id, date: draft.date, workout: draft.workout, gym: draft.gym || currentGym(), entries, savedAt: Date.now(), durationSec };
   // replace if editing an existing id, else add
   const i = state.sessions.findIndex((s) => s.id === session.id);
   if (i >= 0) state.sessions[i] = session; else state.sessions.push(session);
@@ -368,6 +375,7 @@ function renderTrain() {
     }).join("");
     view().innerHTML = `
       <div class="section-title">Start a workout</div>
+      <div class="muted" style="font-size:12px;margin:-8px 0 12px">📍 ${escapeHtml(currentGym())}</div>
       <div class="grid2">${cards}</div>
       <div class="card" style="margin-top:16px">
         <div class="row between">
@@ -483,7 +491,7 @@ function renderHistory() {
     return `<div class="card">
       <div class="hist-item">
         <div><span class="badge ${cls}">${s.workout}</span></div>
-        <div class="muted" style="font-size:13px">${fmtDate(s.date)}${s.durationSec ? " · ⏱ " + fmtDur(s.durationSec) : ""}</div>
+        <div class="muted" style="font-size:13px">${fmtDate(s.date)}${s.durationSec ? " · ⏱ " + fmtDur(s.durationSec) : ""}${s.gym ? " · " + s.gym : ""}</div>
       </div>
       <hr class="sep">
       ${lines}
@@ -850,6 +858,14 @@ function renderSettings() {
   document.getElementById("title").textContent = "Settings";
   view().innerHTML = `
     <div class="card">
+      <div class="section-title" style="margin:0 0 8px">Current gym</div>
+      <label class="fld">New workouts are tagged with this gym</label>
+      <input class="input" id="gymInput" value="${escapeHtml(currentGym())}" placeholder="e.g. Fit4Less B (Waterloo)" />
+      <div style="height:12px"></div>
+      <button class="btn primary" onclick="saveGym()">Save</button>
+    </div>
+
+    <div class="card">
       <div class="section-title" style="margin:0 0 8px">Cloud sync (MongoDB)</div>
       <label class="fld">API endpoint</label>
       <input class="input" id="apiInput" value="${API_BASE()}" placeholder="/api/data" />
@@ -891,6 +907,12 @@ function renderSettings() {
         Last change: ${state.updatedAt ? new Date(state.updatedAt).toLocaleString() : "—"}
       </div>
     </div>`;
+}
+
+function saveGym() {
+  const v = document.getElementById("gymInput").value.trim() || DEFAULT_GYM;
+  localStorage.setItem(LS_GYM, v);
+  toast("Gym updated");
 }
 
 function saveSettings() {
@@ -1026,7 +1048,7 @@ else showLogin();         // first launch (or after logout) -> gate
 // expose handlers used in inline onclick attributes
 Object.assign(window, {
   startWorkout, cancelDraft, finishWorkout, setVal, addSet, removeSet,
-  editSession, deleteSession, onPickExercise, saveSettings, exportData, importData,
+  editSession, deleteSession, onPickExercise, saveSettings, saveGym, exportData, importData,
   pull, go, render, logout, showLogin, doLogin,
   // nutrition
   changeFoodDate, openManualFood, openFoodSearch, closeFoodForm, foodFormInput,
