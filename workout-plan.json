@@ -76,21 +76,14 @@
     ],
     "Lower A": [
       {
-        "name": "Low-Box Step-Ups",
+        "name": "45° Back Extensions",
         "sets": 3,
-        "note": "Low box, drive through the heel, control the descent"
+        "note": "Glutes/hams — legs locked, hinge at the hips, no knee bend"
       },
       {
-        "name": "Seated Leg Curls",
-        "sets": 3
-      },
-      {
-        "name": "Bulgarian Split Squats",
-        "sets": 3
-      },
-      {
-        "name": "Leg Extensions",
-        "sets": 3
+        "name": "Lying Leg Curls",
+        "sets": 3,
+        "note": "Hips flat on the pad, control the negative"
       },
       {
         "name": "Calf Raises",
@@ -184,13 +177,9 @@
     ],
     "Lower B": [
       {
-        "name": "Seated Leg Curls",
-        "sets": 3
-      },
-      {
-        "name": "Machine Hip Thrusts",
+        "name": "Smith Machine Romanian Deadlifts",
         "sets": 3,
-        "note": "Ribs down, full lockout, pause at the top"
+        "note": "Knees soft and still — all the movement is at the hips"
       },
       {
         "name": "Lying Leg Curls",
@@ -255,19 +244,9 @@
     ],
     "Sore Lower": [
       {
-        "name": "Seated Leg Curls",
+        "name": "Lying Leg Curls",
         "sets": 3,
-        "note": "12-15 — first, pump blood into the knees before pressing"
-      },
-      {
-        "name": "Leg Press",
-        "sets": 3,
-        "note": "10-12 @ RPE 7 — feet high, never let the sled crash down"
-      },
-      {
-        "name": "Leg Extensions",
-        "sets": 3,
-        "note": "12-15 — light, half-second pause at the top"
+        "note": "12-15 — light, stop if the knee complains"
       },
       {
         "name": "Seated Calf Raises",
@@ -287,10 +266,10 @@
         "note": "~10 slow reps, breathe through each phase"
       },
       {
-        "name": "Kneeling Hip Flexor Stretch",
+        "name": "Standing Hip Flexor Stretch",
         "sets": 2,
         "timed": true,
-        "note": "Per side — tuck pelvis + squeeze glute (30-45s)"
+        "note": "Per side — staggered stance, tuck pelvis + squeeze glute (30-45s)"
       },
       {
         "name": "Doorway Chest Stretch",
