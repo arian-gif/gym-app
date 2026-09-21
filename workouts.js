@@ -19,10 +19,8 @@ window.WORKOUTS = {
     { name: "Dead Hang", sets: 1, timed: true, note: "20-30s — end of session" },
   ],
   "Lower A": [
-    { name: "Low-Box Step-Ups", sets: 3, note: "Low box, drive through the heel, control the descent" },
-    { name: "Seated Leg Curls", sets: 3 },
-    { name: "Bulgarian Split Squats", sets: 3 },
-    { name: "Leg Extensions", sets: 3 },
+    { name: "45° Back Extensions", sets: 3, note: "Glutes/hams — legs locked, hinge at the hips, no knee bend" },
+    { name: "Lying Leg Curls", sets: 3, note: "Hips flat on the pad, control the negative" },
     { name: "Calf Raises", sets: 3 },
     { name: "Cable Crunches", sets: 3 },
     { name: "Hanging Leg Raises", sets: 3, note: "To failure" },
@@ -46,8 +44,7 @@ window.WORKOUTS = {
     { name: "Dead Hang", sets: 1, timed: true, note: "20-30s — end of session" },
   ],
   "Lower B": [
-    { name: "Seated Leg Curls", sets: 3 },
-    { name: "Machine Hip Thrusts", sets: 3, note: "Ribs down, full lockout, pause at the top" },
+    { name: "Smith Machine Romanian Deadlifts", sets: 3, note: "Knees soft and still — all the movement is at the hips" },
     { name: "Lying Leg Curls", sets: 3, note: "Hips flat on the pad, control the negative" },
     { name: "Calf Raises", sets: 3 },
     { name: "Hanging Leg Raises", sets: 3, note: "To failure" },
@@ -69,16 +66,14 @@ window.WORKOUTS = {
     { name: "Hammer Curls", sets: 2, note: "12-15 — dumbbell or cable, neutral grip to protect elbows" },
   ],
   "Sore Lower": [
-    { name: "Seated Leg Curls", sets: 3, note: "12-15 — first, pump blood into the knees before pressing" },
-    { name: "Leg Press", sets: 3, note: "10-12 @ RPE 7 — feet high, never let the sled crash down" },
-    { name: "Leg Extensions", sets: 3, note: "12-15 — light, half-second pause at the top" },
+    { name: "Lying Leg Curls", sets: 3, note: "12-15 — light, stop if the knee complains" },
     { name: "Seated Calf Raises", sets: 3, note: "12-15 — deep stretch at the bottom for ankle mobility" },
     { name: "Machine Crunches", sets: 2, note: "12-15 — light core, zero lower back strain" },
   ],
   "Posture Fix": [
     // Release
     { name: "Cat-Cow", sets: 1, note: "~10 slow reps, breathe through each phase" },
-    { name: "Kneeling Hip Flexor Stretch", sets: 2, timed: true, note: "Per side — tuck pelvis + squeeze glute (30-45s)" },
+    { name: "Standing Hip Flexor Stretch", sets: 2, timed: true, note: "Per side — staggered stance, tuck pelvis + squeeze glute (30-45s)" },
     { name: "Doorway Chest Stretch", sets: 2, timed: true, note: "Per side — elbow at shoulder height (30s)" },
     // Activate
     { name: "Glute Bridges", sets: 3, note: "3s pause at top, posterior tilt, ribs down" },
