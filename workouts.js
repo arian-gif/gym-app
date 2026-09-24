@@ -1,7 +1,10 @@
 // The 4 workout templates, transcribed from "Upper lower tracker.xlsx".
 // `sets` is the default number of sets; you can add/remove sets per session in the app.
 // `note` carries any stance/form cue from the original sheet.
+// Gym split: A days (Upper A / Lower A) are at Fit4Less Toronto (Morningside);
+// B days (Upper B / Lower B) are at Fit4Less Waterloo.
 window.WORKOUTS = {
+  // Fit4Less Toronto (Morningside)
   "Upper A": [
     { name: "Machine Chest Press", sets: 2 },
     { name: "Weighted Pull-Ups", sets: 2, note: "Log added weight (belt); 0 = bodyweight" },
@@ -18,15 +21,18 @@ window.WORKOUTS = {
     { name: "Dumbbell Wrist Curls", sets: 2, note: "Rest forearms on bench, focus on flexors" },
     { name: "Dead Hang", sets: 1, timed: true, note: "20-30s — end of session" },
   ],
+  // Fit4Less Toronto (Morningside)
   "Lower A": [
-    { name: "45° Back Extensions", sets: 3, note: "Glutes/hams — legs locked, hinge at the hips, no knee bend" },
+    { name: "Smith Machine Romanian Deadlifts", sets: 3, note: "Knees soft and still — all the movement is at the hips" },
     { name: "Lying Leg Curls", sets: 3, note: "Hips flat on the pad, control the negative" },
+    { name: "Bulgarian Split Squats", sets: 3 },
     { name: "Calf Raises", sets: 3 },
     { name: "Cable Crunches", sets: 3 },
     { name: "Hanging Leg Raises", sets: 3, note: "To failure" },
     { name: "Russian Twists", sets: 3, note: "Weighted, 10-15 per side" },
     { name: "Neck Extensions", sets: 3, note: "Use a neck harness or plate behind the head" },
   ],
+  // Fit4Less Waterloo
   "Upper B": [
     { name: "Incline Smith Machine Press", sets: 2, note: "or Dumbbells" },
     { name: "Dead Hang", sets: 1, timed: true, note: "20-30s — decompress after incline pressing" },
@@ -43,9 +49,11 @@ window.WORKOUTS = {
     { name: "Reverse Dumbbell Wrist Curls", sets: 2, note: "Focus on extensors" },
     { name: "Dead Hang", sets: 1, timed: true, note: "20-30s — end of session" },
   ],
+  // Fit4Less Waterloo
   "Lower B": [
-    { name: "Smith Machine Romanian Deadlifts", sets: 3, note: "Knees soft and still — all the movement is at the hips" },
+    { name: "Low-Box Step-Ups", sets: 3, note: "Low box, drive through the heel, control the descent" },
     { name: "Lying Leg Curls", sets: 3, note: "Hips flat on the pad, control the negative" },
+    { name: "Leg Extensions", sets: 3 },
     { name: "Calf Raises", sets: 3 },
     { name: "Hanging Leg Raises", sets: 3, note: "To failure" },
     { name: "Cable Crunches", sets: 3 },

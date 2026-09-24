@@ -76,14 +76,18 @@
     ],
     "Lower A": [
       {
-        "name": "45° Back Extensions",
+        "name": "Smith Machine Romanian Deadlifts",
         "sets": 3,
-        "note": "Glutes/hams — legs locked, hinge at the hips, no knee bend"
+        "note": "Knees soft and still — all the movement is at the hips"
       },
       {
         "name": "Lying Leg Curls",
         "sets": 3,
         "note": "Hips flat on the pad, control the negative"
+      },
+      {
+        "name": "Bulgarian Split Squats",
+        "sets": 3
       },
       {
         "name": "Calf Raises",
@@ -177,14 +181,18 @@
     ],
     "Lower B": [
       {
-        "name": "Smith Machine Romanian Deadlifts",
+        "name": "Low-Box Step-Ups",
         "sets": 3,
-        "note": "Knees soft and still — all the movement is at the hips"
+        "note": "Low box, drive through the heel, control the descent"
       },
       {
         "name": "Lying Leg Curls",
         "sets": 3,
         "note": "Hips flat on the pad, control the negative"
+      },
+      {
+        "name": "Leg Extensions",
+        "sets": 3
       },
       {
         "name": "Calf Raises",
